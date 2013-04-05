@@ -1,4 +1,4 @@
-This is supposed to eventually be a pam module for the Stormpath API
+This is supposed to eventually be a pam module for the Stormpath API. It doesn't work yet. It ALMOST works though.
 
 It has some....problems. The biggest of which is that I'm attempting to learn C in the process of writing it.
 At this point it compiles but I'm pretty sure my problems are related to libcurl not being threadsafe (in addition to manual memory management being an entirely new concept to me).
