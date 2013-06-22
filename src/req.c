@@ -10,6 +10,10 @@
 #include "config.h"
 
 #define SP_URL "https://api.stormpath.com/v1/applications/"
+#define MAX_CREDS_LEN 1024
+#define MAX_SPURL_LEN 4096
+#define MAX_AUTHC_LEN 1024
+#define MAX_AUTH_DATA_LEN 2048
 
 int auth_check(void *json_ptr, size_t total_size)
 {
@@ -51,9 +55,9 @@ int make_req(char *username, char *password)
 	const char BASICAUTHSEP[] = ":";
 	const char LOGINATTEMPTS[] = "/loginAttempts";
 
-	char *spid = malloc(1024);
-	char *spsecret = malloc(1024);
-	char *spapplication = malloc(1024);
+	char *spid = NULL;
+	char *spsecret = NULL;
+	char *spapplication = NULL;
 
 	sp_config(&spid, &spsecret, &spapplication);
 
@@ -69,38 +73,26 @@ int make_req(char *username, char *password)
 	syslog(LOG_INFO, "spsecret: %s", spsecret);
 	syslog(LOG_INFO, "spapplication: %s", spapplication);
 
-	char* creds;
-	//spid[strlen(spid) - 1] = '\0';
-	int cred_len = strlen(spid) + strlen(spsecret) + 2;
-	creds = malloc(cred_len);
-	sprintf(creds, "%s:%s", spid, spsecret);
+        char creds[MAX_CREDS_LEN];
+	snprintf(creds, (size_t) MAX_CREDS_LEN - 1, "%s:%s", spid, spsecret);
 	syslog(LOG_INFO, "Creds: %s", creds);
 
-	char *spurl = malloc(strlen(SP_URL) + strlen(spapplication) + strlen(LOGINATTEMPTS) + 3);
-	strcpy(spurl, SP_URL);
-	strcat(spurl, spapplication);
-	spurl[strlen(spurl) - 1] = '\0';
-	strcat(spurl, LOGINATTEMPTS);
+        char spurl[MAX_SPURL_LEN];
+        snprintf(spurl, (size_t) MAX_SPURL_LEN - 1, "%s%s%s", SP_URL, spapplication, LOGINATTEMPTS);
 	syslog(LOG_INFO, "URL: %s", spurl);
 
-	char* auth_clear;
-	int auth_clear_len = strlen(username) + strlen(password) + 2;
-	auth_clear = malloc(auth_clear_len);
-	sprintf(auth_clear, "%s:%s", username, password);
+	char auth_clear[MAX_AUTHC_LEN];
+	snprintf(auth_clear, (size_t) MAX_AUTHC_LEN, "%s:%s", username, password);
 
-	char *auth_b64;
+        char *auth_b64;
 	b64enc(&auth_b64, auth_clear);
 	syslog(LOG_INFO, "auth_clear: %s", auth_clear);
 	syslog(LOG_INFO, "auth_b64: %s", auth_b64);
 
-	auth_b64[strlen(auth_b64) - 1] = '\0';
 	char pre_json[] = "{\"type\":\"basic\",\"value\":\"";
 	char post_json[] = "\"}";
-	char *auth_data = malloc(strlen(pre_json) + strlen(auth_b64) + strlen(post_json) + 3);
-	strcpy(auth_data, pre_json);
-	strcat(auth_data, auth_b64);
-	auth_data[strlen(auth_data) - 1 ] = '\0';
-	strcat(auth_data, post_json);
+        char auth_data[MAX_AUTH_DATA_LEN];
+        snprintf(auth_data, (size_t) MAX_AUTH_DATA_LEN, "%s%s%s", pre_json, auth_b64, post_json);
 
 	syslog(LOG_INFO, "auth_data: %s", auth_data);
 	syslog(LOG_INFO, "setting up curl");
@@ -144,17 +136,8 @@ int make_req(char *username, char *password)
 	} else {
 		rc = 1;
 	}
-	memset(creds, '\0', cred_len);
-	free(creds);
-	memset(auth_clear, '\0', auth_clear_len);
-	free(auth_clear);
+        free(auth_b64);
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(c);
-	//free(spid);
-	//free(spsecret);
-	//free(spapplication);
-	//free(auth_clear);
-	//free(auth_data);
-	//free(spurl);
 	return rc;
 }
