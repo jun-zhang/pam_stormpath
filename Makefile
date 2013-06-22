@@ -22,6 +22,8 @@ pam_module:
 
 	${CC} -fPIC -shared -o src/pam_stormpath.so src/pam_stormpath.o src/b64enc.o src/cencode.o src/req.o src/config.o -lpam -ljson -lcurl -Wall
 
+	${CC} -fPIC -o pam_stormpath src/pam_stormpath.o src/b64enc.o src/cencode.o src/req.o src/config.o -lpam -ljson -lcurl -Wall
+
 install:
 	cp src/pam_stormpath.so /lib/x86_64-linux-gnu/security/
 .PHONY: all pam clean clean_pam pam_module pam_install install
