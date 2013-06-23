@@ -137,6 +137,9 @@ int make_req(char *username, char *password)
 		rc = 1;
 	}
         free(auth_b64);
+        free(spapplication);
+        free(spsecret);
+        free(spid);
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(c);
 	return rc;
