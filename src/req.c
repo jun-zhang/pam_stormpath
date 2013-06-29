@@ -7,7 +7,7 @@
 #include <json/json.h>
 
 #include "b64enc.h"
-#include "config.h"
+#include "spconfig.h"
 
 #define SP_URL "https://api.stormpath.com/v1/applications/"
 #define MAX_CREDS_LEN 1024
