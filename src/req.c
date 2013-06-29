@@ -52,7 +52,6 @@ int make_req(char *username, char *password)
 	const char SPID[] = "SP_ID";
 	const char SPSECRET[] = "SP_SECRET";
 	const char SPAPPLICATION[] = "SP_APPLICATION";
-	const char BASICAUTHSEP[] = ":";
 	const char LOGINATTEMPTS[] = "/loginAttempts";
 
 	char *spid = NULL;
