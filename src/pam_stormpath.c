@@ -9,7 +9,7 @@
 #include <security/pam_ext.h>
 
 #include "req.h"
-#include "config.h"
+#include "spconfig.h"
 
 int do_sp_auth (char* u, char* p)
 {
